@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ${DB_ROOT}:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    ports:
+      - "${DB_PORT}:${DB_INTERNAL_PORT}"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_DB}"]
+      interval: 5s
+      retries: 5
+    restart: always
+    networks:
+      - default
+    
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ${WEB_ROOT}:/code
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - DB_INTERNAL_PORT
+      - SECRET_KEY
+    ports:
+      - "${WEB_PORT}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default
+
+networks:
+  default:
+    external:
+      name: FinanceNet
