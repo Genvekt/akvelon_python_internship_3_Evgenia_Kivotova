@@ -19,12 +19,13 @@
 │   │   ├── __init__.py     # Package initialisation
 │   │   ├── admin.py        # Admin settings for package
 │   │   ├── apps.py         # Package settings
-│   │   ├── models.py       # Application routes
-│   │   ├── tests.py        # Testing functions
+│   │   ├── models.py       # Package models
+│   │   ├── tests.py        # Testing functions for package
 │   │   ├── urls.py         # Package routing manager
 │   │   └── views.py        # Package controllers
 │   │
 │   └── manage.py           # Django-admin tasts executor
+│ 
 ├── requirements.txt        # Environment files
 ├── Pipfile                 # 
 ├── Pipfile.lock            # 
