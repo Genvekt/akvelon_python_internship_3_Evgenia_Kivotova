@@ -133,3 +133,4 @@ dmypy.json
 
 finance_site/data
 finance_site/finance_manager/migrations/
+finance_db/

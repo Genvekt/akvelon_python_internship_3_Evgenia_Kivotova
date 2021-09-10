@@ -13,13 +13,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import urls
 from django.contrib import admin
+from django.conf.urls import url
 from django.urls import path
-from django.urls.conf import include, include
-
-from finance_manager.views import index
+from django.urls.conf import include
+import rest_framework
+from rest_framework_swagger.views import get_swagger_view
 
 urlpatterns = [
+    url(r'^$', get_swagger_view(title='Finance Cite API')),
+    path('api/auth/', include('rest_framework.urls')),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.authtoken')),
     path('admin/', admin.site.urls),
-    path('finance_manager/', include('finance_manager.urls')),
+    path('api/finance_manager/', include('finance_manager.urls')),
 ]

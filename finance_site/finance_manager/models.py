@@ -1,20 +1,74 @@
 from django.db import models
+from django.db import models
+from django.contrib.auth.models import (
+    BaseUserManager, AbstractUser
+)
+from django.utils.translation import ugettext_lazy as _
+
+class UserManager(BaseUserManager):
+    def create_user(self, email, password, **extra_fields):
+        """
+        Create and save ordnary User with the given email and password.
+        """
+        if not email:
+            raise ValueError(_('Users must have an email address'))
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
 
 
-class User(models.Model):
+    def create_staffuser(self, email, password, **extra_fields):
+        """
+        Create and save a new admin User with the given email and password.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_active', True)
 
-    # We will not create id, because Django creates this attribute by default
-    # id = models.IntegerField(primary_key=True)
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Staffuser must have is_staff=True'))
 
-    # First and Last names - simple Char fields. 100 characters must be anough
-    #    to fit 99.999% of names.
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+        return self.create_user(
+            email,
+            password=password,
+            **extra_fields
+        )
 
-    # Email - obvously, Email field.
-    email = models.EmailField()
+    def create_superuser(self, email, password,  **extra_fields):
+        """
+        Create and save a new superuser User with the given email and password.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True'))
+
+        return self.create_user(
+            email,
+            password=password,
+            **extra_fields
+        )
 
 
+class User(AbstractUser):
+    username = None
+    email = models.EmailField(verbose_name='email address', unique=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = UserManager()
+
+    def __str__(self):
+        return self.email
+
+    
 class Transaction(models.Model):
 
     # We will not create id, because Django creates this attribute by default
@@ -31,4 +85,5 @@ class Transaction(models.Model):
     # Date - Datetime field which will by default will have value 
     #   datetime.now(). `auto_now_add` parameter enables default feature
     #   only at the moment of record addition.
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateField()
+
